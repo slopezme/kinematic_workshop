@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from kinematics_plotter import RobotArm
 
 def test_kinematic_movement(robot, initial_pos, final_pos, frames=200):
@@ -23,7 +24,10 @@ def main():
     Main function to test the robot kinematics and plotting.
     """
     # Path to the robot configuration file
-    config_file = 'robot_config.yaml'
+    # Get the absolute path to the directory containing this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Build the full path to the config file
+    config_file = os.path.join(script_dir, 'robot_config.yaml')
 
     # Create a RobotArm instance
     robot = RobotArm(config_file)
