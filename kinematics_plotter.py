@@ -21,6 +21,10 @@ def animate_movement(robot, initial_angles, final_angles, frames=200, interval=5
         y_coords = [p[1] for p in joint_positions]
         z_coords = [p[2] for p in joint_positions]
         
+        # Print end effector position
+        end_effector_pos = joint_positions[-1]
+        print(f"Frame {frame}: End Effector Position = [{end_effector_pos[0]:.2f}, {end_effector_pos[1]:.2f}, {end_effector_pos[2]:.2f}]")
+
         links.set_data_3d(x_coords, y_coords, z_coords)
         joints._offsets3d = (x_coords, y_coords, z_coords)
 
@@ -31,9 +35,14 @@ def animate_movement(robot, initial_angles, final_angles, frames=200, interval=5
         trace_z = [p[2] for p in end_effector_positions]
         end_effector_trace.set_data_3d(trace_x, trace_y, trace_z)
 
-        return links, joints, end_effector_trace
+        # Update joint position text
+        for i, pos in enumerate(joint_positions):
+            joint_texts[i].set_position((pos[0], pos[1]))
+            joint_texts[i].set_text(f"  J{i}: ({pos[0]:.2f}, {pos[1]:.2f}, {pos[2]:.2f})")
+
+        return links, joints, end_effector_trace, *joint_texts
         
-    fig = plt.figure()
+    fig = plt.figure(figsize=(12, 10)) # Set a bigger figure size
     ax = fig.add_subplot(111, projection='3d')
 
     # Interpolate joint angles
@@ -61,9 +70,16 @@ def animate_movement(robot, initial_angles, final_angles, frames=200, interval=5
     links, = ax.plot(x_coords, y_coords, z_coords, 'b-', marker='o', label='Robot Links')
     joints = ax.scatter(x_coords, y_coords, z_coords, c='r', s=100, label='Joints')
     end_effector_trace, = ax.plot([], [], [], 'g--', label='End-Effector Path')
+
+    # Initialize text annotations for joint positions
+    joint_texts = []
+    for i, pos in enumerate(initial_positions):
+        text = ax.text(pos[0], pos[1], pos[2], f"  J{i}: ({pos[0]:.2f}, {pos[1]:.2f}, {pos[2]:.2f})", fontsize=8)
+        joint_texts.append(text)
     
     end_effector_positions = []
 
-    ani = FuncAnimation(fig, update, frames=frames, interval=interval, blit=False)
+    # Set blit=True for performance, but it can be tricky with text artists. False is safer.
+    ani = FuncAnimation(fig, update, frames=frames, interval=interval, blit=False) 
     plt.legend()
     plt.show()
