@@ -1,0 +1,21 @@
+# Denavit-Hartenberg (DH) parameters for a sample 3-DOF robot arm.
+#
+# Each entry under 'dh_parameters' represents a transformation from one joint's frame to the next.
+# The parameters are:
+# a: link length - distance along x_i from z_{i-1} to z_i
+# alpha: link twist - angle about x_i from z_{i-1} to z_i
+# d: link offset - distance along z_{i-1} from x_{i-1} to x_i
+# theta: joint angle - angle about z_{i-1} from x_{i-1} to x_i (this is the variable for revolute joints)
+#
+# We will define the constant DH parameters here. The 'theta' values will be
+# provided by our kinematics solver, but we can specify an initial angle for visualization.
+
+robot_name: "Sample 3-DOF Arm"
+
+dh_parameters:
+  # From Base (Frame 0) to Joint 1 (Frame 1)
+  - {a: 0,     alpha: 1.5708,  d: 0.5,   theta: 0}  # alpha is pi/2
+  # From Joint 1 (Frame 1) to Joint 2 (Frame 2)
+  - {a: 1.0,   alpha: 0,       d: 0,     theta: 0}
+  # From Joint 2 (Frame 2) to End-Effector (Frame 3)
+  - {a: 1.0,   alpha: 0,       d: 0,     theta: 0}
