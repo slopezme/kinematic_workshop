@@ -38,7 +38,10 @@ def animate_movement(robot, initial_angles, final_angles, frames=200, interval=5
         # Update joint position text
         for i, pos in enumerate(joint_positions):
             joint_texts[i].set_position((pos[0], pos[1]))
-            joint_texts[i].set_text(f"  J{i}: ({pos[0]:.2f}, {pos[1]:.2f}, {pos[2]:.2f})")
+            if i > 0: # Joint 0 is the base, it has no angle
+                angle_deg = np.rad2deg(current_angles[i-1])
+                joint_texts[i].set_text(f"  J{i}: ({pos[0]:.2f}, {pos[1]:.2f}, {pos[2]:.2f})\n  Angle: {angle_deg:.1f}°")
+
 
         return links, joints, end_effector_trace, *joint_texts
         
@@ -74,7 +77,11 @@ def animate_movement(robot, initial_angles, final_angles, frames=200, interval=5
     # Initialize text annotations for joint positions
     joint_texts = []
     for i, pos in enumerate(initial_positions):
-        text = ax.text(pos[0], pos[1], pos[2], f"  J{i}: ({pos[0]:.2f}, {pos[1]:.2f}, {pos[2]:.2f})", fontsize=8)
+        if i > 0:
+            angle_deg = np.rad2deg(initial_angles[i-1])
+            text = ax.text(pos[0], pos[1], pos[2], f"  J{i}: ({pos[0]:.2f}, {pos[1]:.2f}, {pos[2]:.2f})\n  Angle: {angle_deg:.1f}°", fontsize=8)
+        else: # For the base (J0)
+            text = ax.text(pos[0], pos[1], pos[2], f"  J{i}: ({pos[0]:.2f}, {pos[1]:.2f}, {pos[2]:.2f})", fontsize=8)
         joint_texts.append(text)
     
     end_effector_positions = []
