@@ -1,6 +1,7 @@
 import numpy as np
 import os
-from kinematics_plotter import RobotArm
+from tools.robot_arm import RobotArm
+from kinematics_plotter import animate_movement
 
 def test_kinematic_movement(robot, initial_pos, final_pos, frames=200):
     """
@@ -16,7 +17,7 @@ def test_kinematic_movement(robot, initial_pos, final_pos, frames=200):
     print(f"Initial Joint Angles: {np.rad2deg(initial_pos)} degrees")
     print(f"Final Joint Angles: {np.rad2deg(final_pos)} degrees")
     
-    robot.animate_movement(initial_pos, final_pos, frames=frames)
+    animate_movement(robot, initial_pos, final_pos, frames=frames)
     print("Animation finished.")
 
 def main():
