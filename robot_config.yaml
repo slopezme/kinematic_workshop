@@ -1,21 +1,28 @@
-# Denavit-Hartenberg (DH) parameters for a sample 3-DOF robot arm.
+# Robot definition using a Transform (TF) Tree structure, similar to URDF/XACRO.
 #
-# Each entry under 'dh_parameters' represents a transformation from one joint's frame to the next.
-# The parameters are:
-# a: link length - distance along x_i from z_{i-1} to z_i
-# alpha: link twist - angle about x_i from z_{i-1} to z_i
-# d: link offset - distance along z_{i-1} from x_{i-1} to x_i
-# theta: joint angle - angle about z_{i-1} from x_{i-1} to x_i (this is the variable for revolute joints)
-#
-# We will define the constant DH parameters here. The 'theta' values will be
-# provided by our kinematics solver, but we can specify an initial angle for visualization.
+# Each joint connects a 'parent' link to a 'child' link.
+# The 'origin' specifies the transform from the parent's frame to the joint's frame.
+#   - xyz: translation
+#   - rpy: rotation (roll, pitch, yaw) in radians
+# The 'axis' defines the axis of rotation for the revolute joint, in the joint's own frame.
 
 robot_name: "Sample 3-DOF Arm"
 
-dh_parameters:
-  # From Base (Frame 0) to Joint 1 (Frame 1)
-  - {a: 0,     alpha: 1.5708,  d: 0.5,   theta: 0}  # alpha is pi/2
-  # From Joint 1 (Frame 1) to Joint 2 (Frame 2)
-  - {a: 1.0,   alpha: 0,       d: 0,     theta: 0}
-  # From Joint 2 (Frame 2) to End-Effector (Frame 3)
-  - {a: 1.0,   alpha: 0,       d: 0,     theta: 0}
+joints:
+  - name: joint1
+    parent: base_link
+    child: link1
+    origin: {xyz: [0, 0, 0.5], rpy: [0, 0, 0]}
+    axis: {xyz: [0, 0, 1]} # Rotates around Z
+
+  - name: joint2
+    parent: link1
+    child: link2
+    origin: {xyz: [1.0, 0, 0], rpy: [0, 0, 0]}
+    axis: {xyz: [0, 1, 0]} # Rotates around Y
+
+  - name: joint3
+    parent: link2
+    child: tool_link
+    origin: {xyz: [1.0, 0, 0], rpy: [0, 0, 0]}
+    axis: {xyz: [0, 1, 0]} # Rotates around Y

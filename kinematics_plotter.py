@@ -1,6 +1,7 @@
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.spatial.transform import Rotation
 from mpl_toolkits.mplot3d import Axes3D
 
 def get_rotation_z(theta):
@@ -39,20 +40,13 @@ def get_rotation_x(alpha):
         [0, 0,             0,              1]
     ])
 
-def dh_transformation_matrix(a, alpha, d, theta):
+def create_transformation_matrix(translation, rotation_matrix):
     """
-    Computes the Denavit-Hartenberg transformation matrix for a single joint.
-    The transformation is from frame i-1 to frame i.
-    T = Rot(z, theta) * Trans(z, d) * Trans(x, a) * Rot(x, alpha)
+    Creates a 4x4 transformation matrix from a translation vector and a rotation matrix.
     """
-    # Note: The order of multiplication is important.
-    # We are using post-multiplication, so the order is as written.
-    rot_z = get_rotation_z(theta)
-    trans_z = get_translation_z(d)
-    trans_x = get_translation_x(a)
-    rot_x = get_rotation_x(alpha)
-    
-    T = rot_z @ trans_z @ trans_x @ rot_x
+    T = np.identity(4)
+    T[:3, :3] = rotation_matrix
+    T[:3, 3] = translation
     return T
 
 class RobotArm:
@@ -62,7 +56,7 @@ class RobotArm:
         """
         with open(config_file, 'r') as f:
             config = yaml.safe_load(f)
-        self.dh_params = config['dh_parameters']
+        self.joints = config['joints']
         self.name = config.get('robot_name', 'Robot Arm')
 
     def forward_kinematics(self, joint_angles):
@@ -72,26 +66,35 @@ class RobotArm:
         :param joint_angles: A list or array of angles for each revolute joint.
         :return: A list of transformation matrices, one for each joint frame relative to the base.
         """
-        if len(joint_angles) != len(self.dh_params):
-            raise ValueError("Number of joint angles must match the number of DH parameters.")
+        if len(joint_angles) != len(self.joints):
+            raise ValueError("Number of joint angles must match the number of joints.")
 
         # Start with the base frame (identity matrix)
-        T_current = np.identity(4)
-        frame_transforms = [T_current]
+        T_cumulative = np.identity(4)
+        frame_transforms = [T_cumulative]
 
-        for i, params in enumerate(self.dh_params):
-            a = params['a']
-            alpha = params['alpha']
-            d = params['d']
-            # Use the provided joint angle for theta
-            theta = joint_angles[i]
-
-            # Get the transformation from the previous frame to the current one
-            T_link = dh_transformation_matrix(a, alpha, d, theta)
+        for i, joint in enumerate(self.joints):
+            # 1. Get the static transform from parent to joint
+            origin = joint['origin']
+            xyz = origin['xyz']
+            rpy = origin['rpy']
             
-            # Chain the transformation: T_0_i = T_0_{i-1} * T_{i-1}_i
-            T_current = T_current @ T_link
-            frame_transforms.append(T_current)
+            # Static rotation from RPY
+            R_static = Rotation.from_euler('xyz', rpy).as_matrix()
+            T_static = create_transformation_matrix(xyz, R_static)
+
+            # 2. Get the dynamic transform from the joint rotation
+            axis = joint['axis']['xyz']
+            angle = joint_angles[i]
+            
+            # Dynamic rotation from axis-angle
+            R_dynamic = Rotation.from_rotvec(np.array(axis) * angle).as_matrix()
+            T_dynamic = create_transformation_matrix([0, 0, 0], R_dynamic)
+            
+            # 3. Chain the transforms: T_world_child = T_world_parent * T_parent_child
+            # The transform to this joint's frame is T_static followed by T_dynamic
+            T_cumulative = T_cumulative @ T_static @ T_dynamic
+            frame_transforms.append(T_cumulative)
             
         return frame_transforms
 
