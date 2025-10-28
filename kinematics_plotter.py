@@ -9,6 +9,10 @@ def animate_movement(robot, initial_angles, final_angles, frames=200, interval=5
     Animates the robot's movement from an initial to a final joint configuration.
     """
     def update(frame):
+        # Clear the end-effector path at the beginning of each animation cycle
+        if frame == 0:
+            end_effector_positions.clear()
+
         # Get joint angles for the current frame
         current_angles = joint_angles_over_time[frame]
         
