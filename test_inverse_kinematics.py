@@ -10,11 +10,10 @@ def main():
     """
     # --- Setup ---
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, 'robot_config.yaml')
+    config_file = os.path.join(script_dir, 'robot2_config.yaml')
     robot = RobotArm(config_file)
 
     # --- Path Definition ---
-    # Define a straight line path for the end-effector
     start_pos = np.array([0.5, 0.5, 0.5])
     end_pos = np.array([-1.0, 1.0, 1.5])
     num_steps = 100
@@ -51,13 +50,9 @@ def main():
     # --- Animation ---
     # Animate the robot moving through the calculated joint angles
     print("\nAnimating the calculated robot movement...")
-    # We need to create a smooth animation, so we'll animate between each step.
-    animate_movement(robot, all_joint_angles[0], all_joint_angles[-1], frames=len(all_joint_angles))
-    # The animate_movement function interpolates between a start and end angle set.
-    # To show the actual calculated path, we can create a custom animation loop
-    # or, for simplicity here, we can just show the movement from the first
-    # calculated position to the last one.
-    animate_movement(robot, all_joint_angles[0], all_joint_angles[-1], frames=num_steps)
+    # Pass the actual path start and end points to the animation for plotting.
+    animate_movement(robot, all_joint_angles[0], all_joint_angles[-1], 
+                     path_start_pos=start_pos, path_end_pos=end_pos, frames=num_steps)
 
 if __name__ == "__main__":
     main()

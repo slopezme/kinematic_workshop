@@ -5,7 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.gridspec as gridspec
 
 
-def animate_movement(robot, initial_angles, final_angles, frames=200, interval=50):
+def animate_movement(robot, initial_angles, final_angles, path_start_pos=None, path_end_pos=None, frames=200, interval=50):
     """
     Animates the robot's movement from an initial to a final joint configuration.
     """
@@ -83,6 +83,18 @@ def animate_movement(robot, initial_angles, final_angles, frames=200, interval=5
     links, = ax.plot(x_coords, y_coords, z_coords, 'b-', marker='o', label='Robot Links')
     joints = ax.scatter(x_coords, y_coords, z_coords, c='r', s=100, label='Joints')
     end_effector_trace, = ax.plot([], [], [], 'g--', label='End-Effector Path')
+
+    # Plot the overall target path start and end points if provided
+    if path_start_pos is not None:
+        ax.scatter(path_start_pos[0], path_start_pos[1], path_start_pos[2],
+                   color='green', marker='*', s=300, label='Path Start Target', edgecolors='black', linewidths=1)
+        # Also plot the robot's actual initial end-effector position (from initial_angles)
+        robot_initial_ee_pos = initial_positions[-1]
+        ax.scatter(robot_initial_ee_pos[0], robot_initial_ee_pos[1], robot_initial_ee_pos[2],
+                   color='blue', marker='o', s=200, label='Robot Initial EE Pos', edgecolors='black', linewidths=1)
+    if path_end_pos is not None:
+        ax.scatter(path_end_pos[0], path_end_pos[1], path_end_pos[2],
+                   color='red', marker='*', s=300, label='Path End Target', edgecolors='black', linewidths=1)
 
     end_effector_positions = []
 
