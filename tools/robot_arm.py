@@ -68,7 +68,8 @@ class RobotArm:
             lower_rad = np.deg2rad(limit['lower'])
             upper_rad = np.deg2rad(limit['upper'])
             resolution_rad = np.deg2rad(resolution_deg)
-            angle_ranges.append(np.arange(lower_rad, upper_rad, resolution_rad))
+            # Add resolution_rad to upper_rad to make sure the upper limit is included in the range
+            angle_ranges.append(np.arange(lower_rad, upper_rad + resolution_rad, resolution_rad))
 
         # Create all combinations of joint angles
         # This creates a grid of angle combinations
