@@ -1,6 +1,7 @@
 import yaml
 import numpy as np
 from scipy.spatial.transform import Rotation
+from scipy.optimize import minimize
 from .transforms import create_transformation_matrix
 
 class RobotArm:
@@ -86,3 +87,48 @@ class RobotArm:
         
         print(f"Workspace computation finished. Found {len(workspace_points)} reachable points.")
         return np.array(workspace_points)
+
+    def inverse_kinematics(self, target_position, initial_guess_angles, tolerance=1e-3, max_iterations=100):
+        """
+        Computes inverse kinematics using numerical optimization.
+
+        :param target_position: The desired 3D position for the end-effector.
+        :param initial_guess_angles: A seed/starting point for the joint angles optimization.
+        :param tolerance: The acceptable position error tolerance.
+        :param max_iterations: The maximum number of iterations for the optimizer.
+        :return: A tuple containing (final_joint_angles, final_position, final_error).
+        """
+        
+        # Objective function: Minimize the distance between end-effector and target
+        def error_function(angles):
+            transforms = self.forward_kinematics(angles)
+            current_position = transforms[-1][:3, 3]
+            error = np.linalg.norm(current_position - target_position)
+            return error
+
+        # Get joint limits from config to use as bounds for the optimizer
+        bounds = []
+        for joint in self.joints:
+            limit = joint.get('limit', {'lower': -360, 'upper': 360}) # Default to full rotation if no limits
+            bounds.append((np.deg2rad(limit['lower']), np.deg2rad(limit['upper'])))
+
+        # Run the optimization
+        result = minimize(
+            error_function,
+            initial_guess_angles,
+            method='L-BFGS-B',  # A method that respects bounds
+            bounds=bounds,
+            tol=tolerance,
+            options={'maxiter': max_iterations}
+        )
+
+        # Get the final results from the optimization
+        final_angles = result.x
+        final_transforms = self.forward_kinematics(final_angles)
+        final_position = final_transforms[-1][:3, 3]
+        final_error = np.linalg.norm(final_position - target_position)
+
+        if not result.success:
+            print(f"Warning: IK optimization may not have converged. Message: {result.message}")
+
+        return final_angles, final_position, final_error
