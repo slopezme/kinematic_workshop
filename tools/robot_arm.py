@@ -51,3 +51,37 @@ class RobotArm:
             frame_transforms.append(T_cumulative)
             
         return frame_transforms
+
+    def compute_workspace(self, resolution_deg=30):
+        """
+        Computes the robot's workspace by sampling joint angles.
+
+        :param resolution_deg: The step size in degrees for sampling each joint's range of motion.
+        :return: A list of reachable 3D points for the end-effector.
+        """
+        print(f"Computing workspace with a resolution of {resolution_deg} degrees...")
+        
+        angle_ranges = []
+        for joint in self.joints:
+            # Use limits from config, or default to full 360-degree range
+            limit = joint.get('limit', {'lower': 0, 'upper': 360})
+            lower_rad = np.deg2rad(limit['lower'])
+            upper_rad = np.deg2rad(limit['upper'])
+            resolution_rad = np.deg2rad(resolution_deg)
+            angle_ranges.append(np.arange(lower_rad, upper_rad, resolution_rad))
+
+        # Create all combinations of joint angles
+        # This creates a grid of angle combinations
+        joint_angle_combinations = np.array(np.meshgrid(*angle_ranges)).T.reshape(-1, len(self.joints))
+
+        workspace_points = []
+        total_combinations = len(joint_angle_combinations)
+        for i, angles in enumerate(joint_angle_combinations):
+            if (i + 1) % 100000 == 0:
+                print(f"  ... calculated {i+1} of {total_combinations} points")
+            frame_transforms = self.forward_kinematics(angles)
+            end_effector_position = frame_transforms[-1][:3, 3]
+            workspace_points.append(end_effector_position)
+        
+        print(f"Workspace computation finished. Found {len(workspace_points)} reachable points.")
+        return np.array(workspace_points)

@@ -24,21 +24,15 @@ def main():
     """
     Main function to test the robot kinematics and plotting.
     """
-    # Path to the robot configuration file
-    # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Build the full path to the config file
     config_file = os.path.join(script_dir, 'robot_config.yaml')
 
     # Create a RobotArm instance
     robot = RobotArm(config_file)
 
     # Define initial and final joint positions for the movement test
-    initial_joint_angles = [0, 0, 0]
-    final_joint_angles_degrees = [180, 90, -180]
-
-    final_joint_angles = np.deg2rad(final_joint_angles_degrees)
-    # Run the kinematic movement test
+    initial_joint_angles = np.deg2rad([0, 0, 0])
+    final_joint_angles = np.deg2rad([180, 90, -180])
     test_kinematic_movement(robot, initial_joint_angles, final_joint_angles)
 
 if __name__ == "__main__":

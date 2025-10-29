@@ -8,6 +8,7 @@ This project is a simple and educational tool to demonstrate the principles of r
 - **Forward Kinematics**: Calculates the position and orientation of each joint and the end-effector.
 - **3D Visualization**: Plots the robot arm in its given configuration using `matplotlib`.
 - **Animation**: Animates the robot's movement between two joint configurations and traces the path of the end-effector.
+- **Workspace Computation**: Computes and visualizes the reachable workspace of the robot's end-effector.
 
 ## Getting Started
 
@@ -25,12 +26,13 @@ You need to have Python 3 installed.
 
 ### How to Run
 
-The main entry point for testing is `test_robot.py`. This script loads the robot configuration, sets some example joint angles, and generates a 3D plot of the robot.
+There are two main scripts you can run:
 
-To run the simulation:
+#### Animate Robot Movement
 
+To see an animation of the robot moving between two configurations, run `test_forward_kinematics.py`:
 ```bash
-python kinematic_workshop/test_robot.py
+python3 kinematic_workshop/test_forward_kinematics.py
 ```
 
 This will open a `matplotlib` window showing an animation of the robot arm moving from a start to an end configuration.

@@ -94,3 +94,26 @@ def animate_movement(robot, initial_angles, final_angles, frames=200, interval=5
     ani = FuncAnimation(fig, update, frames=frames, interval=interval, blit=False) 
     plt.legend()
     plt.show()
+
+def plot_workspace(robot, workspace_points):
+    """
+    Creates a 3D scatter plot of the robot's workspace.
+
+    :param robot: An instance of the RobotArm class (for naming the plot).
+    :param workspace_points: A NumPy array of 3D points (Nx3).
+    """
+    fig = plt.figure(figsize=(12, 10))
+    ax = fig.add_subplot(111, projection='3d')
+
+    x = workspace_points[:, 0]
+    y = workspace_points[:, 1]
+    z = workspace_points[:, 2]
+
+    ax.scatter(x, y, z, c=z, cmap='viridis', s=1, alpha=0.5)
+
+    ax.set_xlabel('X-axis')
+    ax.set_ylabel('Y-axis')
+    ax.set_zlabel('Z-axis')
+    ax.set_title(f'Workspace for {robot.name}')
+    ax.set_aspect('equal', adjustable='box')
+    plt.show()
