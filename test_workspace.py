@@ -20,10 +20,29 @@ def main():
     # Create a RobotArm instance
     robot = RobotArm(config_file)
 
+    # --- Resolution Adjustment ---
+    # Adjust resolution based on the number of joints to keep computation time reasonable.
+    num_dof = len(robot.joints)
+    
+    # Define minimum resolution (larger number means coarser) based on DOF
+    resolution_caps = {
+        4: 15,  # For 4-DOF, resolution should be at least 15 degrees
+        5: 30,  # For 5-DOF, at least 30 degrees
+        6: 45   # For 6-DOF, at least 45 degrees
+    }
+    # For 3-DOF or less, any user-provided resolution is generally fine.
+    min_resolution_for_dof = resolution_caps.get(num_dof, 1) # Default to 1 (no limit) for low DOF
+
+    final_resolution = args.res
+    if final_resolution < min_resolution_for_dof:
+        print(f"Warning: Requested resolution of {args.res}° is very fine for a {num_dof}-DOF robot.")
+        print(f"         Adjusting to {min_resolution_for_dof}° to ensure reasonable computation time.")
+        final_resolution = min_resolution_for_dof
+
     # --- Workspace Computation ---
     # Compute the workspace points. This might take a while depending on the resolution.
     # Note: A high resolution (low --res value) can be very computationally expensive!
-    workspace_points = robot.compute_workspace(resolution_deg=args.res)
+    workspace_points = robot.compute_workspace(resolution_deg=final_resolution)
 
     # --- Plotting ---
     # Plot the collected workspace points all at once.

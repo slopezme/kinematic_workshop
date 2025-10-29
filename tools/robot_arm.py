@@ -60,6 +60,7 @@ class RobotArm:
         :param resolution_deg: The step size in degrees for sampling each joint's range of motion.
         :return: A list of reachable 3D points for the end-effector.
         """
+        import itertools
         print(f"Computing workspace with a resolution of {resolution_deg} degrees...")
         
         angle_ranges = []
@@ -72,15 +73,19 @@ class RobotArm:
             # Add resolution_rad to upper_rad to make sure the upper limit is included in the range
             angle_ranges.append(np.arange(lower_rad, upper_rad + resolution_rad, resolution_rad))
 
-        # Create all combinations of joint angles
-        # This creates a grid of angle combinations
-        joint_angle_combinations = np.array(np.meshgrid(*angle_ranges)).T.reshape(-1, len(self.joints))
+        # Calculate and print the total number of points to be computed.
+        num_steps_per_joint = [len(r) for r in angle_ranges]
+        total_combinations = np.prod(num_steps_per_joint) if num_steps_per_joint else 0
+        print(f"Total points to compute: {total_combinations:,}")
+
+        # Use itertools.product for a memory-efficient way to get all angle combinations
+        joint_angle_iterator = itertools.product(*angle_ranges)
 
         workspace_points = []
-        total_combinations = len(joint_angle_combinations)
-        for i, angles in enumerate(joint_angle_combinations):
-            if (i + 1) % 100000 == 0:
-                print(f"  ... calculated {i+1} of {total_combinations} points")
+        for i, angles in enumerate(joint_angle_iterator):
+            # Print progress update
+            if (i + 1) % 100000 == 0 or (i + 1) == total_combinations:
+                print(f"  ... calculated {i+1:,} of {total_combinations:,} points ({((i+1)/total_combinations)*100:.1f}%)")
             frame_transforms = self.forward_kinematics(angles)
             end_effector_position = frame_transforms[-1][:3, 3]
             workspace_points.append(end_effector_position)

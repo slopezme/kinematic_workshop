@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import yaml
 from tools.robot_arm import RobotArm
 from kinematics_plotter import animate_movement
 
@@ -26,13 +27,21 @@ def main():
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     config_file = os.path.join(script_dir, 'robot2_config.yaml')
-
+    
+    # Load the full configuration to get test parameters
+    with open(config_file, 'r') as f:
+        config = yaml.safe_load(f)
+    
     # Create a RobotArm instance
     robot = RobotArm(config_file)
 
-    # Define initial and final joint positions for the movement test
-    initial_joint_angles = np.deg2rad([0, 0, 0])
-    final_joint_angles = np.deg2rad([180, 90, -180])
+    # Get initial and final joint angles from the config file
+    test_params = config['test_config']['forward_kinematics_animation']
+    initial_angles_deg = test_params['initial_angles_deg']
+    final_angles_deg = test_params['final_angles_deg']
+
+    initial_joint_angles = np.deg2rad(initial_angles_deg)
+    final_joint_angles = np.deg2rad(final_angles_deg)
     test_kinematic_movement(robot, initial_joint_angles, final_joint_angles)
 
 if __name__ == "__main__":
