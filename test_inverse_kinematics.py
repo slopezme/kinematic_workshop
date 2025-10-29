@@ -10,7 +10,7 @@ def main():
     """
     # --- Setup ---
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, 'robot_config_6_dof.yaml')
+    config_file = os.path.join(script_dir, 'robot_config.yaml')
     robot = RobotArm(config_file)
 
     # --- Path Definition ---

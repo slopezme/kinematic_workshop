@@ -25,7 +25,7 @@ def main():
     Main function to test the robot kinematics and plotting.
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, 'robot_config.yaml')
+    config_file = os.path.join(script_dir, 'robot2_config.yaml')
 
     # Create a RobotArm instance
     robot = RobotArm(config_file)
