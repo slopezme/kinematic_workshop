@@ -10,12 +10,12 @@ def main():
     """
     # --- Setup ---
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, 'robot_config.yaml')
+    config_file = os.path.join(script_dir, 'robot_config_6_dof.yaml')
     robot = RobotArm(config_file)
 
     # --- Path Definition ---
     # Define a straight line path for the end-effector
-    start_pos = np.array([1.5, 0.5, 0.5])
+    start_pos = np.array([0.5, 0.5, 0.5])
     end_pos = np.array([-1.0, 1.0, 1.5])
     num_steps = 100
     path_points = np.linspace(start_pos, end_pos, num_steps)
@@ -25,7 +25,9 @@ def main():
     
     # Use a starting seed for the first point (e.g., home position)
     # Subsequent points will use the previous result as a seed.
-    seed_angles = np.deg2rad([90, 45, 45])
+    # Initialize seed angles to zeros, with a size matching the number of joints.
+    num_joints = len(robot.joints)
+    seed_angles = np.zeros(num_joints)
     
     all_joint_angles = []
     actual_path = []
@@ -51,6 +53,11 @@ def main():
     print("\nAnimating the calculated robot movement...")
     # We need to create a smooth animation, so we'll animate between each step.
     animate_movement(robot, all_joint_angles[0], all_joint_angles[-1], frames=len(all_joint_angles))
+    # The animate_movement function interpolates between a start and end angle set.
+    # To show the actual calculated path, we can create a custom animation loop
+    # or, for simplicity here, we can just show the movement from the first
+    # calculated position to the last one.
+    animate_movement(robot, all_joint_angles[0], all_joint_angles[-1], frames=num_steps)
 
 if __name__ == "__main__":
     main()

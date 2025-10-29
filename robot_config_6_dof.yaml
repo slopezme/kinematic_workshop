@@ -1,0 +1,57 @@
+# Robot definition for a generic 6-DOF articulated robot arm.
+#
+# The structure follows a standard industrial robot design:
+# - Joint 1: Waist/Base rotation (Z-axis)
+# - Joint 2: Shoulder pitch (Y-axis)
+# - Joint 3: Elbow pitch (Y-axis)
+# - Joint 4: Wrist roll (X-axis)
+# - Joint 5: Wrist pitch (Y-axis)
+# - Joint 6: Wrist roll / Flange rotation (X-axis)
+
+robot_name: "Generic 6-DOF Arm"
+
+joints:
+  # --- Base and Shoulder ---
+  - name: joint1_waist
+    parent: base_link
+    child: link1_waist
+    origin: {xyz: [0, 0, 0.15], rpy: [0, 0, 0]} # Base height
+    axis: {xyz: [0, 0, 1]} # Rotates around Z
+    limit: {lower: -180, upper: 180}
+
+  - name: joint2_shoulder
+    parent: link1_waist
+    child: link2_shoulder
+    origin: {xyz: [0, 0, 0], rpy: [0, 0, 0]}
+    axis: {xyz: [0, 1, 0]} # Rotates around Y
+    limit: {lower: -90, upper: 90}
+
+  # --- Arm and Elbow ---
+  - name: joint3_elbow
+    parent: link2_shoulder
+    child: link3_elbow
+    origin: {xyz: [0.4, 0, 0], rpy: [0, 0, 0]} # Length of upper arm
+    axis: {xyz: [0, 1, 0]} # Rotates around Y
+    limit: {lower: -150, upper: 150}
+
+  # --- Wrist ---
+  - name: joint4_wrist1
+    parent: link3_elbow
+    child: link4_wrist1
+    origin: {xyz: [0.35, 0, 0], rpy: [0, 0, 0]} # Length of forearm
+    axis: {xyz: [1, 0, 0]} # Rotates around X (roll)
+    limit: {lower: -180, upper: 180}
+
+  - name: joint5_wrist2
+    parent: link4_wrist1
+    child: link5_wrist2
+    origin: {xyz: [0, 0, 0], rpy: [0, 0, 0]}
+    axis: {xyz: [0, 1, 0]} # Rotates around Y (pitch)
+    limit: {lower: -120, upper: 120}
+
+  - name: joint6_wrist3
+    parent: link5_wrist2
+    child: tool_link # The final link where a tool would be attached
+    origin: {xyz: [0.1, 0, 0], rpy: [0, 0, 0]} # Length of the wrist/flange
+    axis: {xyz: [1, 0, 0]} # Rotates around X (roll)
+    limit: {lower: -180, upper: 180}
