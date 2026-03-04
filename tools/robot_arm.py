@@ -48,7 +48,7 @@ class RobotArm:
             
             # 3. Chain the transforms: T_world_child = T_world_parent * T_parent_child
             # The transform to this joint's frame is T_static followed by T_dynamic
-            T_cumulative = T_cumulative @ T_static @ T_dynamic
+            T_cumulative = np.matmul(np.matmul(T_cumulative, T_static), T_dynamic)
             frame_transforms.append(T_cumulative)
             
         return frame_transforms

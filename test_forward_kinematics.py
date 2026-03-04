@@ -18,7 +18,8 @@ def test_kinematic_movement(robot, initial_pos, final_pos, frames=200):
     print(f"Initial Joint Angles: {np.rad2deg(initial_pos)} degrees")
     print(f"Final Joint Angles: {np.rad2deg(final_pos)} degrees")
     
-    animate_movement(robot, initial_pos, final_pos, frames=frames)
+    # Store the animation object to prevent it from being garbage-collected
+    anim = animate_movement(robot, initial_pos, final_pos, frames=frames)
     print("Animation finished.")
 
 def main():
@@ -26,7 +27,7 @@ def main():
     Main function to test the robot kinematics and plotting.
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, 'robot2_config.yaml')
+    config_file = os.path.join(script_dir, 'robot_config.yaml')
     
     # Load the full configuration to get test parameters
     with open(config_file, 'r') as f:

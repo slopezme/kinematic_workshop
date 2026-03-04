@@ -19,20 +19,28 @@ You need to have Python 3 installed.
 ### Installation
 
 1.  Clone this repository or download the files.
-2.  Install the required Python libraries:
+2.  Navigate into the project directory:
+    ```bash
+    cd kinematic_workshop
+    ```
+3.  Create and activate a Python virtual environment. This creates an isolated environment for the project's dependencies.
+    ```bash
+    # Create the virtual environment (e.g., named 'venv')
+    python3 -m venv venv
+    # Activate it
+    source venv/bin/activate
+    ```
+
+4.  Install the required Python libraries inside the virtual environment:
     ```bash
     pip install numpy pyyaml matplotlib scipy
     ```
 
 ### How to Run
 
-There are two main scripts you can run:
-
-#### Animate Robot Movement
-
 To see an animation of the robot moving between two configurations, run `test_forward_kinematics.py`:
 ```bash
-python3 kinematic_workshop/test_forward_kinematics.py
+python3 test_forward_kinematics.py
 ```
 
 This will open a `matplotlib` window showing an animation of the robot arm moving from a start to an end configuration.

@@ -27,8 +27,8 @@ def animate_movement(robot, initial_angles, final_angles, path_start_pos=None, p
         z_coords = [p[2] for p in joint_positions]
         
         # Print end effector position
-        end_effector_pos = joint_positions[-1]
-        print(f"Frame {frame}: End Effector Position = [{end_effector_pos[0]:.2f}, {end_effector_pos[1]:.2f}, {end_effector_pos[2]:.2f}]")
+        # end_effector_pos = joint_positions[-1]
+        # print(f"Frame {frame}: End Effector Position = [{end_effector_pos[0]:.2f}, {end_effector_pos[1]:.2f}, {end_effector_pos[2]:.2f}]")
 
         links.set_data_3d(x_coords, y_coords, z_coords)
         joints._offsets3d = (x_coords, y_coords, z_coords)
@@ -100,8 +100,8 @@ def animate_movement(robot, initial_angles, final_angles, path_start_pos=None, p
 
     # --- Table Setup ---
     col_labels = ['Position (x,y,z)', 'Angle (°)']
-    num_joints = len(robot.joints)
-    row_labels = [f'J{i}' for i in range(num_joints + 1)] # J0 is base
+    # Use actual joint names for table rows, starting with the base link.
+    row_labels = ['base_link'] + [joint['name'] for joint in robot.joints]
     
     # Initialize table with data from initial position
     cell_text = []
@@ -120,14 +120,16 @@ def animate_movement(robot, initial_angles, final_angles, path_start_pos=None, p
     
     # Correctly gather the cell objects for updating.
     table_cells = []
-    # The table has (num_joints + 1) data rows (from index 1 to num_joints + 1)
-    for i in range(1, num_joints + 2):
+    # The table has len(row_labels) data rows (from index 1 to len(row_labels))
+    for i in range(1, len(row_labels) + 1):
         table_cells.append([table.get_celld()[(i, 0)], table.get_celld()[(i, 1)]])
 
     # Set blit=True for performance, but it can be tricky with text artists. False is safer.
-    ani = FuncAnimation(fig, update, frames=frames, interval=interval, blit=False) 
-    plt.legend()
+    ani = FuncAnimation(fig, update, frames=frames, interval=interval, blit=False)
+    # Create the legend using the artists from the axes
+    ax.legend()
     plt.show()
+    return ani
 
 def plot_workspace(robot, workspace_points):
     """
