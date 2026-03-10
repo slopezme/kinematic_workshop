@@ -160,7 +160,7 @@ angles, position, error = robot.inverse_kinematics(target, initial_guess)
 ```
 
 ### 3DOF Robot with Analytical IK
-```python
+```python![alt text](image.png)
 from tools.robot_3dof_dh import Robot3DOF_DH
 
 robot = Robot3DOF_DH(L1=1.0)
@@ -176,6 +176,10 @@ transforms = robot.forward_kinematics(joint_values)
 ## 🧪 Testing (Visual Output)
 
 ### Numerical IK Tests (Error Minimization)
+```bash
+source venv/bin/activate
+```
+
 ```bash
 # Forward kinematics animation (default robot)
 python3 tests/numerical_ik/test_forward_kinematics.py
@@ -201,7 +205,9 @@ python3 tests/numerical_ik/test_workspace.py --res 10 --config robot2_config.yam
 # 3D visualization with coordinate frames
 python3 tests/analytical_ik/test_3dof_visual.py
 ```
-
+```bash
+python3 tests/analytical_ik/test_3dof_workspace.py
+```
 **See the pipeline guides for all tests and detailed explanations:**
 - [Numerical IK Pipeline Guide](docs/NUMERICAL_IK_PIPELINE.md)
 - [Analytical IK Pipeline Guide](docs/ANALYTICAL_IK_PIPELINE.md)
