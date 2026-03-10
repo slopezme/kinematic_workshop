@@ -1,0 +1,60 @@
+robot_name: "3DOF DH Robot with Analytical IK"
+
+L1: 1.0
+
+dh_parameters:
+  - joint_number: 1
+    joint_type: revolute
+    theta_offset: 0
+    d: 1.0
+    a: 0
+    alpha_deg: 90
+    alpha_rad: 1.5707963267948966
+    description: "Revolute joint around Z-axis"
+    
+  - joint_number: 2
+    joint_type: revolute
+    theta_offset: 0
+    d: 0
+    a: 0
+    alpha_deg: -90
+    alpha_rad: -1.5707963267948966
+    description: "Revolute joint around Z-axis"
+    
+  - joint_number: 3
+    joint_type: prismatic
+    theta: 0
+    d_offset: 0
+    a: 0
+    alpha_deg: 0
+    alpha_rad: 0
+    description: "Prismatic joint along Z-axis"
+
+joint_limits:
+  q1:
+    lower_rad: -3.14159
+    upper_rad: 3.14159
+    lower_deg: -180
+    upper_deg: 180
+    
+  q2:
+    lower_rad: -1.5708
+    upper_rad: 1.5708
+    lower_deg: -90
+    upper_deg: 90
+    
+  q3:
+    lower: 0.0
+    upper: 2.0
+    units: meters
+
+test_config:
+  target_positions:
+    - name: "Position 1"
+      xyz: [0.5, 0.5, 1.5]
+    - name: "Position 2"
+      xyz: [0.0, 1.0, 0.5]
+    - name: "Position 3"
+      xyz: [1.0, 0.0, 2.0]
+    - name: "Position 4"
+      xyz: [-0.5, -0.5, 1.0]

@@ -1,5 +1,10 @@
+import sys
 import numpy as np
 import os
+
+# Add parent directory to path to import modules
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 from tools.robot_arm import RobotArm
 from kinematics_plotter import animate_movement
 
@@ -10,7 +15,7 @@ def main():
     """
     # --- Setup ---
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, 'robot2_config.yaml')
+    config_file = os.path.join(script_dir, '../../configs/robot_config.yaml')
     robot = RobotArm(config_file)
 
     # --- Path Definition ---

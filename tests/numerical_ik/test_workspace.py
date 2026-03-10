@@ -1,5 +1,10 @@
+import sys
 import os
 import argparse
+
+# Add parent directory to path to import modules
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 from tools.robot_arm import RobotArm
 from kinematics_plotter import plot_workspace
 
@@ -15,7 +20,7 @@ def main():
 
     # Path to the robot configuration file
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, 'robot_config.yaml')
+    config_file = os.path.join(script_dir, '../../configs/robot_config.yaml')
 
     # Create a RobotArm instance
     robot = RobotArm(config_file)

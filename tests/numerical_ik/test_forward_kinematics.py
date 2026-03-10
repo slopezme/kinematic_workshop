@@ -1,6 +1,11 @@
+import sys
 import numpy as np
 import os
 import yaml
+
+# Add parent directory to path to import modules
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 from tools.robot_arm import RobotArm
 from kinematics_plotter import animate_movement
 
@@ -27,7 +32,7 @@ def main():
     Main function to test the robot kinematics and plotting.
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, 'robot_config.yaml')
+    config_file = os.path.join(script_dir, '../../configs/robot_config.yaml')
     
     # Load the full configuration to get test parameters
     with open(config_file, 'r') as f:
