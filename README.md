@@ -171,22 +171,27 @@ joint_values = robot.inverse_kinematics(target)
 transforms = robot.forward_kinematics(joint_values)
 ```
 
-## 🧪 Testing
+## 🧪 Testing (Visual Output)
 
 ### Numerical IK Tests (Error Minimization)
 ```bash
+# Forward kinematics animation
 python3 tests/numerical_ik/test_forward_kinematics.py
+
+# Inverse kinematics path following animation
 python3 tests/numerical_ik/test_inverse_kinematics.py
+
+# Workspace visualization
 python3 tests/numerical_ik/test_workspace.py --res 10
 ```
 
 ### Analytical IK Tests (Closed-Form Solution)
 ```bash
-python3 tests/analytical_ik/test_3dof_simple.py
+# 3D visualization with coordinate frames
 python3 tests/analytical_ik/test_3dof_visual.py
 ```
 
-**See the pipeline guides for detailed explanations:**
+**See the pipeline guides for all tests and detailed explanations:**
 - [Numerical IK Pipeline Guide](docs/NUMERICAL_IK_PIPELINE.md)
 - [Analytical IK Pipeline Guide](docs/ANALYTICAL_IK_PIPELINE.md)
 
