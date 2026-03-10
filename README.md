@@ -77,6 +77,9 @@ python3 tests/numerical_ik/test_workspace.py --res 40 --config robot2_config.yam
 ```bash
 # 3D visualization with coordinate frames
 python3 tests/analytical_ik/test_3dof_visual.py
+
+# Animated trajectory following (similar to numerical IK)
+python3 tests/analytical_ik/test_3dof_path_animation.py
 ```
 
 ### 📊 Comparison
