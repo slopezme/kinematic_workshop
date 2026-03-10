@@ -16,11 +16,13 @@ def main():
     parser = argparse.ArgumentParser(description="Kinematic Workshop: Compute and plot the robot's workspace.")
     parser.add_argument('--res', type=int, default=5, 
                         help="Resolution in degrees for sampling joint angles. Smaller is more detailed but slower.")
+    parser.add_argument('--config', type=str, default='robot_config.yaml',
+                        help="Robot configuration file (default: robot_config.yaml)")
     args = parser.parse_args()
 
     # Path to the robot configuration file
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, '../../configs/robot_config.yaml')
+    config_file = os.path.join(script_dir, '../../configs', args.config)
 
     # Create a RobotArm instance
     robot = RobotArm(config_file)

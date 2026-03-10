@@ -117,9 +117,9 @@ class Robot3DOF_DH:
         )
         
         # Compute cumulative transforms from base
-        T_0_1_cumulative = T_base @ T_0_1
-        T_0_2_cumulative = T_0_1_cumulative @ T_1_2
-        T_0_3_cumulative = T_0_2_cumulative @ T_2_3
+        T_0_1_cumulative = np.dot(T_base, T_0_1)
+        T_0_2_cumulative = np.dot(T_0_1_cumulative, T_1_2)
+        T_0_3_cumulative = np.dot(T_0_2_cumulative, T_2_3)
         
         # Return transforms: [base, joint1, joint2, joint3/end-effector]
         return [T_base, T_0_1_cumulative, T_0_2_cumulative, T_0_3_cumulative]

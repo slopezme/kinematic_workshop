@@ -57,6 +57,11 @@ python3 tests/numerical_ik/test_inverse_kinematics.py
 
 # Workspace computation
 python3 tests/numerical_ik/test_workspace.py --res 10
+
+# To test with another robot configuration, run:
+python3 tests/numerical_ik/test_forward_kinematics.py --config robot2_config.yaml
+python3 tests/numerical_ik/test_inverse_kinematics.py --config robot2_config.yaml
+python3 tests/numerical_ik/test_workspace.py --res 40 --config robot2_config.yaml
 ```
 
 ### 2. 🎯 Analytical IK (Closed-Form Solution)
@@ -70,14 +75,8 @@ python3 tests/numerical_ik/test_workspace.py --res 10
 
 **Quick Start:**
 ```bash
-# Simple test (no visualization)
-python3 tests/analytical_ik/test_3dof_simple.py
-
-# Visual test (3D plots with coordinate frames)
+# 3D visualization with coordinate frames
 python3 tests/analytical_ik/test_3dof_visual.py
-
-# Usage examples
-python3 examples/3dof_robot/example_3dof_usage.py
 ```
 
 ### 📊 Comparison
@@ -175,14 +174,23 @@ transforms = robot.forward_kinematics(joint_values)
 
 ### Numerical IK Tests (Error Minimization)
 ```bash
-# Forward kinematics animation
+# Forward kinematics animation (default robot)
 python3 tests/numerical_ik/test_forward_kinematics.py
+
+# Forward kinematics with alternative robot configuration
+python3 tests/numerical_ik/test_forward_kinematics.py --config robot2_config.yaml
 
 # Inverse kinematics path following animation
 python3 tests/numerical_ik/test_inverse_kinematics.py
 
+# Inverse kinematics with alternative robot
+python3 tests/numerical_ik/test_inverse_kinematics.py --config robot2_config.yaml
+
 # Workspace visualization
 python3 tests/numerical_ik/test_workspace.py --res 10
+
+# Workspace with alternative robot
+python3 tests/numerical_ik/test_workspace.py --res 10 --config robot2_config.yaml
 ```
 
 ### Analytical IK Tests (Closed-Form Solution)

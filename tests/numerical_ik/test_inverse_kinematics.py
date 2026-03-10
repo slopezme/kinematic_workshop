@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import os
+import argparse
 
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -13,9 +14,15 @@ def main():
     Main function to test the inverse kinematics by making the robot
     follow a straight line path with its end-effector.
     """
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Test inverse kinematics with path following.")
+    parser.add_argument('--config', type=str, default='robot_config.yaml',
+                        help="Robot configuration file (default: robot_config.yaml)")
+    args = parser.parse_args()
+    
     # --- Setup ---
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(script_dir, '../../configs/robot_config.yaml')
+    config_file = os.path.join(script_dir, '../../configs', args.config)
     robot = RobotArm(config_file)
 
     # --- Path Definition ---
