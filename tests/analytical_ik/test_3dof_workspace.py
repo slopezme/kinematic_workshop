@@ -118,6 +118,33 @@ def compute_workspace(robot, q1_limits=(-90, 90), q2_limits=(-45, 60),
     return workspace_points
 
 
+def compute_task_space(workspace_points, x_limits, y_limits, z_limits):
+    """
+    Computes the task space as a rectangular 3D region within the workspace.
+    Task space represents the specific region where the robot performs its task.
+    
+    :param workspace_points: Array of workspace positions
+    :param x_limits: Tuple (min, max) for X coordinate in meters
+    :param y_limits: Tuple (min, max) for Y coordinate in meters
+    :param z_limits: Tuple (min, max) for Z coordinate in meters
+    :return: Array of task space points (subset of workspace)
+    """
+    print(f"\nComputing TASK SPACE (rectangular region within workspace)...")
+    print(f"  Task region: X=[{x_limits[0]}m, {x_limits[1]}m], Y=[{y_limits[0]}m, {y_limits[1]}m], Z=[{z_limits[0]}m, {z_limits[1]}m]")
+    
+    # Filter workspace points that fall within the task space bounds
+    mask = (
+        (workspace_points[:, 0] >= x_limits[0]) & (workspace_points[:, 0] <= x_limits[1]) &
+        (workspace_points[:, 1] >= y_limits[0]) & (workspace_points[:, 1] <= y_limits[1]) &
+        (workspace_points[:, 2] >= z_limits[0]) & (workspace_points[:, 2] <= z_limits[1])
+    )
+    
+    task_space_points = workspace_points[mask]
+    print(f"✓ Task space computed: {len(task_space_points):,} points")
+    
+    return task_space_points
+
+
 def plot_workspace(robot, workspace_points):
     """
     Plot the workspace as a 3D point cloud.
@@ -231,14 +258,16 @@ def plot_workspace_volume(robot, workspace_points):
     plt.show()
 
 
-def plot_workspace_combined(robot, config_space_points, workspace_points):
+def plot_workspace_combined(robot, config_space_points, workspace_points, task_space_points=None, task_limits=None):
     """
-    Plot both configuration space and workspace in a single figure with two subplots.
+    Plot configuration space, workspace, and task space in a single figure with two subplots.
     Shows point cloud and volumetric surface views side by side.
     
     :param robot: Robot3DOF_DH instance
     :param config_space_points: Array of configuration space positions (physical limits)
     :param workspace_points: Array of workspace positions (with operational constraints)
+    :param task_space_points: Array of task space positions (specific task region), optional
+    :param task_limits: Tuple of (x_limits, y_limits, z_limits) for task space box, optional
     """
     from scipy.spatial import ConvexHull
     
@@ -260,13 +289,20 @@ def plot_workspace_combined(robot, config_space_points, workspace_points):
     ax1.scatter(config_space_points[:, 0], 
                 config_space_points[:, 1], 
                 config_space_points[:, 2],
-                c='green', alpha=0.2, s=1, label='Configuration Space (Physical Limits)')
+                c='green', alpha=0.15, s=1, label='Configuration Space (Physical Limits)')
     
     # Plot workspace (grey/dark grey)
     ax1.scatter(workspace_points[:, 0], 
                 workspace_points[:, 1], 
                 workspace_points[:, 2],
-                c='dimgrey', alpha=0.5, s=2, label='Workspace (Operational Constraints)')
+                c='dimgrey', alpha=0.4, s=2, label='Workspace (Operational Constraints)')
+    
+    # Plot task space (red/orange) if provided
+    if task_space_points is not None and len(task_space_points) > 0:
+        ax1.scatter(task_space_points[:, 0], 
+                    task_space_points[:, 1], 
+                    task_space_points[:, 2],
+                    c='orangered', alpha=0.8, s=3, label='Task Space (Specific Task Region)')
     
     ax1.scatter([0], [0], [0], c='red', s=100, marker='o', label='Base', zorder=10)
     
@@ -295,7 +331,7 @@ def plot_workspace_combined(robot, config_space_points, workspace_points):
             triangle = config_space_points[simplex]
             ax2.plot_trisurf(triangle[:, 0], triangle[:, 1], triangle[:, 2],
                             triangles=[[0, 1, 2]], 
-                            color='green', alpha=0.2, edgecolor='darkgreen', linewidth=0.1)
+                            color='green', alpha=0.15, edgecolor='darkgreen', linewidth=0.1)
         
         print(f"  ✓ Configuration space hull: {len(hull_config.simplices)} triangular faces")
         
@@ -310,19 +346,58 @@ def plot_workspace_combined(robot, config_space_points, workspace_points):
             triangle = workspace_points[simplex]
             ax2.plot_trisurf(triangle[:, 0], triangle[:, 1], triangle[:, 2],
                             triangles=[[0, 1, 2]], 
-                            color='dimgrey', alpha=0.5, edgecolor='black', linewidth=0.2)
+                            color='dimgrey', alpha=0.4, edgecolor='black', linewidth=0.2)
         
         print(f"  ✓ Workspace hull: {len(hull_workspace.simplices)} triangular faces")
         
     except Exception as e:
         print(f"  Warning: Could not compute workspace hull: {e}")
     
+    # Plot task space as rectangular box if provided
+    if task_space_points is not None and len(task_space_points) > 0 and task_limits is not None:
+        # Get the actual task space bounds from the limits used
+        # We'll draw a wireframe box to represent the task space region
+        from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+        
+        # Use the exact task limits provided
+        tx_min, tx_max = task_limits[0]
+        ty_min, ty_max = task_limits[1]
+        tz_min, tz_max = task_limits[2]
+        
+        # Define the 8 vertices of the rectangular box
+        vertices = [
+            [tx_min, ty_min, tz_min],
+            [tx_max, ty_min, tz_min],
+            [tx_max, ty_max, tz_min],
+            [tx_min, ty_max, tz_min],
+            [tx_min, ty_min, tz_max],
+            [tx_max, ty_min, tz_max],
+            [tx_max, ty_max, tz_max],
+            [tx_min, ty_max, tz_max]
+        ]
+        
+        # Define the 6 faces of the box
+        faces = [
+            [vertices[0], vertices[1], vertices[5], vertices[4]],  # Front
+            [vertices[2], vertices[3], vertices[7], vertices[6]],  # Back
+            [vertices[0], vertices[3], vertices[7], vertices[4]],  # Left
+            [vertices[1], vertices[2], vertices[6], vertices[5]],  # Right
+            [vertices[0], vertices[1], vertices[2], vertices[3]],  # Bottom
+            [vertices[4], vertices[5], vertices[6], vertices[7]]   # Top
+        ]
+        
+        # Create the 3D polygon collection for the box
+        box = Poly3DCollection(faces, alpha=0.5, facecolor='orangered', edgecolor='darkred', linewidth=2)
+        ax2.add_collection3d(box)
+        
+        print(f"  ✓ Task space box: rectangular region")
+    
     ax2.scatter([0], [0], [0], c='red', s=100, marker='o', label='Base', zorder=10)
     
     ax2.set_xlabel('X (m)', fontsize=11)
     ax2.set_ylabel('Y (m)', fontsize=11)
     ax2.set_zlabel('Z (m)', fontsize=11)
-    ax2.set_title('Volumetric View\nConfiguration Space vs Workspace', 
+    ax2.set_title('Volumetric View\nConfiguration Space vs Workspace vs Task Space', 
                   fontsize=12, fontweight='bold')
     
     # Create custom legend
@@ -330,8 +405,10 @@ def plot_workspace_combined(robot, config_space_points, workspace_points):
     legend_elements = [
         Patch(facecolor='green', alpha=0.3, label='Configuration Space'),
         Patch(facecolor='dimgrey', alpha=0.5, label='Workspace'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='r', markersize=8, label='Base')
     ]
+    if task_space_points is not None and len(task_space_points) > 0:
+        legend_elements.append(Patch(facecolor='orangered', alpha=0.7, label='Task Space'))
+    legend_elements.append(plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='r', markersize=8, label='Base'))
     ax2.legend(handles=legend_elements, loc='upper left', fontsize=9)
     ax2.grid(True, alpha=0.3)
     
@@ -400,6 +477,37 @@ def main():
         resolution_deg=resolution
     )
     
+    # Analyze workspace bounds to help define task space
+    print(f"\nWorkspace bounds:")
+    print(f"  X: [{workspace_points[:, 0].min():.2f}m, {workspace_points[:, 0].max():.2f}m]")
+    print(f"  Y: [{workspace_points[:, 1].min():.2f}m, {workspace_points[:, 1].max():.2f}m]")
+    print(f"  Z: [{workspace_points[:, 2].min():.2f}m, {workspace_points[:, 2].max():.2f}m]")
+    
+    # 3. Define TASK SPACE bounds (rectangular region within workspace)
+    # This represents the specific 3D region where the robot performs its task
+    # These bounds must be within the workspace region
+    # Set task space to be a larger region covering more of the workspace
+    x_min, x_max = workspace_points[:, 0].min(), workspace_points[:, 0].max()
+    y_min, y_max = workspace_points[:, 1].min(), workspace_points[:, 1].max()
+    z_min, z_max = workspace_points[:, 2].min(), workspace_points[:, 2].max()
+    
+    # Create a task space covering about 25% of workspace in each dimension
+    x_range = x_max - x_min
+    y_range = y_max - y_min
+    z_range = z_max - z_min
+    
+    task_x_limits = (x_min + 0.375 * x_range, x_max - 0.375 * x_range)   # Central 25% in X
+    task_y_limits = (y_min + 0.375 * y_range, y_max - 0.375 * y_range)   # Central 25% in Y
+    task_z_limits = (z_min + 0.5 * z_range, z_max - 0.25 * z_range)      # Upper 25% in Z
+    
+    # Compute Task Space
+    task_space_points = compute_task_space(
+        workspace_points,
+        x_limits=task_x_limits,
+        y_limits=task_y_limits,
+        z_limits=task_z_limits
+    )
+    
     # Generate visualizations
     if config_space_points.size > 0 and workspace_points.size > 0:
         print("\n" + "="*70)
@@ -409,8 +517,12 @@ def main():
         print("\nCreating combined visualization...")
         print(f"  Configuration space: {len(config_space_points):,} points (green)")
         print(f"  Workspace: {len(workspace_points):,} points (grey)")
+        if task_space_points.size > 0:
+            print(f"  Task space: {len(task_space_points):,} points (orange-red)")
         
-        plot_workspace_combined(robot, config_space_points, workspace_points)
+        # Pass task limits to ensure box uses exact bounds
+        task_limits_tuple = (task_x_limits, task_y_limits, task_z_limits)
+        plot_workspace_combined(robot, config_space_points, workspace_points, task_space_points, task_limits_tuple)
     
     print("\n" + "="*70)
     print("✓ Analysis complete!")
@@ -418,7 +530,8 @@ def main():
     print("\nSummary:")
     print(f"  Configuration Space: All positions reachable within physical limits")
     print(f"  Workspace: Positions reachable with operational constraints")
-    print(f"  Constraints represent: obstacles, safety zones, cable limits, etc.")
+    print(f"  Task Space: Specific rectangular region for the task")
+    print(f"  Relationship: Configuration Space ⊃ Workspace ⊃ Task Space")
 
 
 if __name__ == "__main__":

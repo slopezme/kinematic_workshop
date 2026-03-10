@@ -205,6 +205,11 @@ python3 tests/numerical_ik/test_workspace.py --res 10 --config robot2_config.yam
 # 3D visualization with coordinate frames
 python3 tests/analytical_ik/test_3dof_visual.py
 ```
+
+```bash
+python3 tests/analytical_ik/test_3dof_trajectory.py
+```
+
 ```bash
 python3 tests/analytical_ik/test_3dof_workspace.py
 ```
